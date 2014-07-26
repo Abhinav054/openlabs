@@ -6,6 +6,12 @@
 
 {% block content %}
 <div class="row">
+    <form action="{% url 'contactapp:contacts:search' %}" method="get">
+        <input name="q" type="text">
+        <input type="submit" value="search">
+    </form>
+</div>
+<div class="row">
      <p><a href="{% url 'contactapp:contacts:create' %}" class="btn">Create Contact</a></p>
     <div class="col-sm-6">
         <h3>Frequently Used</h3>

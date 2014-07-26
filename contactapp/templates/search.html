@@ -1,0 +1,17 @@
+{% extends '_layouts/base.html' %}
+
+{% block title %}{{ headline }} | Search Results | {{ block.super }}{% endblock title %}
+
+{% block headline %}
+<h2>I see you Searched{{object}}</h2>
+{% endblock headline %}
+
+{% block content %}
+	{% for o in searchobject%}
+		<a href="{{ o.get_absolute_url }}">{{ o.first_name }}{{o.last_name}}</a>
+	{% empty %}
+            <li class="list-group-item">You have no contact that match the query</li>
+	{%endfor%}
+	
+{% endblock content %}
+

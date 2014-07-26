@@ -1,0 +1,14 @@
+{% extends '_layouts/base.html' %}
+
+{% block title %}{{ headline }} | Search Results | {{ block.super }}{% endblock title %}
+
+{% block headline %}
+<h2>I see you Searched</h2>
+{% endblock headline %}
+
+{% block content %}
+	{% for o in Context['searchresults']%}
+		<li>{{o.first_name}}</li>
+	{%endfor%}
+	
+{% endblock content %}

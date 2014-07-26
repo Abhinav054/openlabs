@@ -18,6 +18,7 @@ lists_patterns = patterns(
 	url(r'^home/(?P<cpk>[-\w]+)/update/(?P<pk>[-\w]+)$', views.HomeContactUpdateView.as_view(),name='homecontactupdate'),
 	url(r'^office/(?P<cpk>[-\w]+)/update/(?P<pk>[-\w]+)$', views.OfficeContactUpdateView.as_view(),name='officecontactupdate'),
 	url(r'^other/(?P<cpk>[-\w]+)/update/(?P<pk>[-\w]+)$', views.OtherContactUpdateView.as_view(),name='othercontactupdate'),
+	url(r'^search/$',views.SearchView.as_view(),name='search'),
 	)
 	
 urlpatterns = patterns(

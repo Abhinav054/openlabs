@@ -8,6 +8,8 @@ from . import forms
 from django.http import Http404
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from . import utils
+
 
 
 # restricts querys to be restricted to the current user loggedin
@@ -156,3 +158,22 @@ class ContactRemoveView(views.LoginRequiredMixin, generic.RedirectView):
                 self.object))
 		self.object.delete()
 		return super(ContactRemoveView, self).get(request, *args, **kwargs)
+
+
+
+
+class SearchView(views.LoginRequiredMixin, generic.TemplateView):
+	
+	template_name = 'search.html'
+
+	def get_context_data(self, **kwargs):
+		query_string = ''
+		found_entries = None
+		if ('q' in self.request.GET) and self.request.GET['q'].strip():
+			query_string = self.request.GET['q']
+			contact_query = utils.get_query(query_string,['first_name','last_name'])
+			found_entries = models.Contact.objects.filter(contact_query, user = self.request.user).order_by('last_visited')
+		context = super(SearchView, self).get_context_data(**kwargs)
+		context['searchobject'] = found_entries
+		return context
+
