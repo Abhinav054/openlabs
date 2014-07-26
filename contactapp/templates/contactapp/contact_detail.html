@@ -1,0 +1,119 @@
+{% extends '_layouts/base.html' %}
+
+{% block title %}{{ object.name }} | Details| {{ block.super }}{% endblock title %}
+
+{% block headline %}
+<h1>{{object}} {{object.last_name}}</h1>
+{% endblock headline %}
+	
+{% block content %}
+<div class="row">
+    <div class="col-sm-6">
+    	<div class="row basic-contact">
+    		<h2>Basic Contact</h2>
+    		<table class="table table-bordered">
+    			<tr>
+    				<td>Email id</td>
+    				<td>{{object.email_id}}</td>
+    			</tr>
+    			<tr>
+    				<td>Mobile Number</td>
+    				<td>{{object.mobile_number}}</td>
+    			</tr>
+    		</table>
+    	</div>
+    	<div class="row">
+    		<h2>Residential Contact</h2>
+    		
+    		{% for o in object.home.all %}
+    		<a href="{{o.get_update_url}}">Edit</a>
+    		<table class="table table-bordered">
+    			<tr>
+    				<td>Telephone Number</td>
+    				<td>{{o.telephone_number}}</td>
+    			</tr>
+    			<tr>
+    				<td>City</td>
+    				<td>{{o.city}}</td>
+    			</tr>
+    			<tr>
+    				<td>Address</td>
+    				<td>{{o.address}}</td>
+    			</tr>
+    		</table>
+    		{% endfor %}
+    		
+    	</div>
+    	<div class="row">
+    		<h2>Office Contact</h2>
+    		
+    		{% for o in object.office.all %}
+    		<a href="{{o.get_update_url}}">Edit</a>
+    		<table class="table table-bordered">
+    			<tr>
+    				<td>Company</td>
+    				<td>{{o.company}}</td>
+    			</tr>
+    			<tr>
+    				<td>Designation</td>
+    				<td>{{o.designation}}</td>
+    			</tr>
+    			<tr>
+    				<td>Email id</td>
+    				<td>{{o.email_id}}</td>
+    			</tr>
+    			<tr>
+    				<td>Telephone Number</td>
+    				<td>{{o.telephone_number}}</td>
+    			</tr>
+    			<tr>
+    				<td>Address</td>
+    				<td>{{o.address}}</td>
+    			</tr>
+    		</table>
+    		{% endfor %}
+    		
+    	</div>
+    	<div class="row">
+    		<h2>Social Contact</h2>
+    		<table class="table table-bordered">
+    		{% for o in object.social.all %}
+    			<tr>
+    				<td>{{o.social_site}}</td>
+    				<td>{{o.detail}}</td>
+    				<td><a href="{{o.get_update_url}}">Edit</a></td>
+    			</tr>
+
+    		{% endfor %}
+    		</table>
+    	</div>
+
+    	<div class="row">
+    		<h2>Other Contact</h2>
+    		<table class="table table-bordered">
+    		{% for o in object.other.all %}
+    			<tr>
+    				<td>{{o.name}}</td>
+    				<td>{{o.details}}</td>
+    				<td><a href="{{o.get_update_url}}">Edit</a></td>
+    			</tr>
+
+    		{% endfor %}
+    		</table>
+    	</div>
+        
+    </div>
+
+    <div class="col-sm-6">
+    	<li><a href="{{object.get_remove_url}}">Delete</a></li>
+        <li><a href="{% url 'contactapp:contacts:list' %}">Back to contacts</a></li>
+        <li><a href="{{object.get_homecreate_url}}">Add Home Contact Detail</a></li>
+        <li><a href="{{object.get_officecreate_url}}">Add Office Contact Detail</a></li>
+        <li><a href="{{object.get_socialcreate_url}}">Add Social Contact Detail</a></li>
+        <li><a href="{{object.get_othercreate_url}}">Add any other Detail</a></li>
+    </div>
+</div>
+<div class="row">
+	
+</div>
+{% endblock %}

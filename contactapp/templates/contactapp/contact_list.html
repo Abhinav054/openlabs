@@ -1,0 +1,49 @@
+{% extends '_layouts/base.html' %}
+
+{% block title %}Contact Lists | {{ block.super }}{% endblock title %}
+
+{% block headline %}<h1>Contacts</h1>{% endblock headline %}
+
+{% block content %}
+<div class="row">
+     <p><a href="{% url 'contactapp:contacts:create' %}" class="btn">Create Contact</a></p>
+    <div class="col-sm-6">
+        <h3>Frequently Used</h3>
+        <ul class="list-group">
+            {% for object in object_list|dictsortreversed:"n_visited"|slice:":5" %}
+            <li class="list-group-item">
+                <a href="{{ object.get_absolute_url }}">{{ object }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-sm-6">
+        <h3>Last Used</h3>
+        <ul class="list-group">
+            {% for object in object_list|dictsortreversed:"last_visited"|slice:":5" %}
+            <li class="list-group-item">
+                <a href="{{ object.get_absolute_url }}">{{ object }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+       <h3>All Contacts</h3>
+        <ul class="list-group">
+            {% for object in object_list|dictsortreversed:"n_visited"|slice:":5" %}
+            <li class="list-group-item">
+                <a href="{{ object.get_absolute_url }}">{{ object }}</a>
+                <a href="{{object.get_update_url}}">Update</a>
+            </li>
+            {% empty %}
+            <li class="list-group-item">You have no lists</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-sm-6">
+       
+    </div>
+</div>
+{% endblock %}
