@@ -3,5 +3,34 @@
 {% block headline %}<h1>ContactApp</h1>{% endblock headline %}
 
 {% block content %}
-<p>Howdy{% if user.is_authenticated %} {{ user.username }}{% endif %}!</p>
+{% if not user.is_authenticated %}
+	<p>Please Login</p>
+{% else %}
+<div class="row">
+	<div class="col-md-5">
+		<form action="{%url 'contactapp:contacts:cbcreate'%}" method="">
+			<input name="name" type="text">
+			<input type="submit" value="Create New Book">
+		</form>
+	</div>
+	<div class="col-md-5">
+		<form action="{% url 'contactapp:contacts:search' %}" method="get">
+			<input name="q" type="text">
+			<input type="submit" value="Search by Name">
+		</form>
+	</div>
+</div>
+<div class="row">
+	{% for o in object_list%}
+		<div class='col-md-4' style="border:1px #FFDCDC solid">
+			<h2>{{o}}</h2>
+			<h5>Number of Contacts:{{o.contact_count}}</h5>
+			<a href="{{o.get_list_url}}">Open ContactBook</a>
+		</div>
+		
+	{%empty%}
+	<p>Shit Man How did that happened</p>
+	{%endfor%}
+</div>
+{% endif %}
 {% endblock %}

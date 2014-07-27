@@ -6,10 +6,22 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from braces import views
+from django.db.models import Count
 from django.shortcuts import redirect
+from contactapp.models import ContactBook
 
-class HomePageView(generic.TemplateView):
+
+class HomePageView(generic.ListView):
     template_name = 'home.html'
+    model = ContactBook
+    def get_queryset(self):
+    	if self.request.user.is_authenticated():
+    		queryset = super(HomePageView, self).get_queryset()
+    		queryset = queryset.filter(user=self.request.user)
+    		queryset = queryset.annotate(contact_count=Count('contacts')) 
+    		return queryset
+	    		
+			
 
 class SignUpView(generic.CreateView, views.AnonymousRequiredMixin, views.FormValidMessageMixin):
 	form_class = RegistrationForm
@@ -17,6 +29,10 @@ class SignUpView(generic.CreateView, views.AnonymousRequiredMixin, views.FormVal
 	model = User
 	success_url = reverse_lazy('home')
 	template_name = 'accounts/signup.html'
+	def form_valid(self, form):
+		resp = super(SignUpView, self).form_valid(form)
+		ContactBook.objects.create(user=self.object, name='My Book')
+		return resp
 
 class LoginView(generic.FormView, views.AnonymousRequiredMixin, views.FormValidMessageMixin):
 	form_class = LoginForm

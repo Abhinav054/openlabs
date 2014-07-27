@@ -106,7 +106,7 @@
 
     <div class="col-sm-6">
     	<li><a href="{{object.get_remove_url}}">Delete</a></li>
-        <li><a href="{% url 'contactapp:contacts:list' %}">Back to contacts</a></li>
+        <li><a href="{{back_url}}">Back to contacts</a></li>
         <li><a href="{{object.get_homecreate_url}}">Add Home Contact Detail</a></li>
         <li><a href="{{object.get_officecreate_url}}">Add Office Contact Detail</a></li>
         <li><a href="{{object.get_socialcreate_url}}">Add Social Contact Detail</a></li>

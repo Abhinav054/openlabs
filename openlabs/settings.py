@@ -37,10 +37,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_extensions',
     'crispy_forms',
     'south',
     'contactapp',
-    'django_extensions'
+    
 )
 
 MIDDLEWARE_CLASSES = (
@@ -62,12 +63,8 @@ WSGI_APPLICATION = 'openlabs.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'contactapp',
-        'USER': 'root',
-        'PASSWORD': 'abhinav',
-        'HOST': '',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'abhinav',
     }
 }
 

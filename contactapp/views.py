@@ -26,8 +26,17 @@ class RestrictToUserMixin(views.LoginRequiredMixin):
 class ContactListView(views.LoginRequiredMixin, generic.ListView):
 	model = models.Contact
 
+	def get_context_data(self, **kwargs):
+		create_url = self.kwargs['cbpk']
+		create_url = reverse('contactapp:contacts:contactcreate',kwargs={'cbpk':create_url})
+		context = super(ContactListView, self).get_context_data(**kwargs)
+		context['create_url'] = create_url
+		return context
+
 	def get_queryset(self):
-		return self.request.user.contacts.all()
+		queryset = super(ContactListView, self).get_queryset()
+		queryset = queryset.filter(contact_book = self.kwargs['cbpk'])
+		return queryset
 
 
 class ContactDetailView(views.LoginRequiredMixin, generic.DetailView):
@@ -37,6 +46,16 @@ class ContactDetailView(views.LoginRequiredMixin, generic.DetailView):
 	# 	self.arg = arg
 	model = models.Contact
 	# prefetch_related = ('home','social')
+
+	def get_context_data(self, **kwargs):
+		cbpk = self.kwargs['cbpk']
+		back_url = reverse('contactapp:contacts:list',kwargs={'cbpk':cbpk})
+		context = super(ContactDetailView, self).get_context_data(**kwargs)
+		context['cbpk'] = cbpk
+		context['back_url'] = back_url
+		return context
+
+
 
 	def get_object(self):
 		obj = super(ContactDetailView, self).get_object()
@@ -56,22 +75,26 @@ class ContactCreateView(views.LoginRequiredMixin, views.SetHeadlineMixin, generi
 
 	def form_valid(self, form):
 		self.object = form.save(commit=False)
-		self.object.user = self.request.user
+		self.object.contact_book_id = self.kwargs['cbpk']
 		self.object.save()
 		return super(ContactCreateView, self).form_valid(form)
 
 
 
 
-class ContactUpdateView(RestrictToUserMixin, views.LoginRequiredMixin, views.SetHeadlineMixin, generic.UpdateView):
+class ContactUpdateView(views.LoginRequiredMixin, views.SetHeadlineMixin, generic.UpdateView):
 	form_class = forms.ContactForm
 	headline = 'Update'
 	model = models.Contact
+
 
 class HomeContactCreateView(views.LoginRequiredMixin, views.SetHeadlineMixin, generic.CreateView):
 	form_class = forms.HomeForm
 	headline = 'Add'
 	model = models.HomeContact
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 	def form_valid(self, form):
 		self.object = form.save(commit=False)
 		self.object.contact_id = self.kwargs['cpk']
@@ -85,6 +108,10 @@ class OfficeContactCreateView(views.LoginRequiredMixin, views.SetHeadlineMixin, 
 	form_class = forms.OfficeForm
 	headline = 'Add'
 	model = models.OfficeContact
+
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 	def form_valid(self, form):
 		self.object = form.save(commit=False)
 		self.object.contact_id = self.kwargs['cpk']
@@ -97,6 +124,10 @@ class SocialContactCreateView(views.LoginRequiredMixin, views.SetHeadlineMixin, 
 	form_class = forms.SocialForm
 	headline = 'Add'
 	model = models.SocialContact
+
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 	def form_valid(self, form):
 		self.object = form.save(commit=False)
 		self.object.contact_id = self.kwargs['cpk']
@@ -107,6 +138,10 @@ class OtherContactCreateView(views.LoginRequiredMixin, views.SetHeadlineMixin, g
 	form_class = forms.OtherForm
 	headline = 'Add'
 	model = models.OtherContact
+
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 	def form_valid(self, form):
 		self.object = form.save(commit=False)
 		self.object.contact_id = self.kwargs['cpk']
@@ -119,32 +154,43 @@ class HomeContactUpdateView(views.LoginRequiredMixin, views.SetHeadlineMixin, ge
 	headline = 'Update'
 	model = models.HomeContact
 
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 
 class OfficeContactUpdateView(views.LoginRequiredMixin, views.SetHeadlineMixin, generic.UpdateView):
 	form_class = forms.OfficeForm
 	headline = 'Update'
 	model = models.OfficeContact
 
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 class SocialContactUpdateView(views.LoginRequiredMixin, views.SetHeadlineMixin, generic.UpdateView):
 	form_class = forms.SocialForm
 	headline = 'Update'
 	model = models.SocialContact
+
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
 
 class OtherContactUpdateView(views.LoginRequiredMixin, views.SetHeadlineMixin, generic.UpdateView):
 	form_class = forms.OtherForm
 	headline = 'Update'
 	model = models.OtherContact
 
+	def get_success_url(self):
+		return reverse('contactapp:contacts:detail',kwargs={'cbpk':self.kwargs['cbpk'],'pk':self.kwargs['cpk']})
+
 class ContactRemoveView(views.LoginRequiredMixin, generic.RedirectView):
 
 	model = models.Contact
 	def get_redirect_url(self,*args,**kwargs):
-		return reverse('contactapp:contacts:list')
+		return reverse('contactapp:contacts:list',kwargs={'cbpk':self.kwargs['cbpk']})
 	def get_object(self,pk):
 		try:
 			contact = self.model.objects.get(
-				pk=pk,
-				user=self.request.user)
+				pk=pk)
 		except models.Contact.DoesNotExist:
 			raise Http404
 		else:
@@ -172,8 +218,19 @@ class SearchView(views.LoginRequiredMixin, generic.TemplateView):
 		if ('q' in self.request.GET) and self.request.GET['q'].strip():
 			query_string = self.request.GET['q']
 			contact_query = utils.get_query(query_string,['first_name','last_name'])
-			found_entries = models.Contact.objects.filter(contact_query, user = self.request.user).order_by('last_visited')
+			found_entries = models.Contact.objects.filter(contact_query, contact_book__user = self.request.user).order_by('last_visited')
 		context = super(SearchView, self).get_context_data(**kwargs)
 		context['searchobject'] = found_entries
 		return context
 
+class ContactBookCreateView(views.LoginRequiredMixin, generic.RedirectView):
+	model = models.ContactBook
+
+	def get_redirect_url(self,*args,**kwargs):
+		return reverse('home')
+
+
+	def get(self, request, *args, **kwargs):
+		self.object = models.ContactBook(name=self.request.GET['name'], user=self.request.user)
+		self.object.save()
+		return super(ContactBookCreateView, self).get(request, *args, **kwargs)

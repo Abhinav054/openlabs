@@ -6,8 +6,25 @@ from datetime import datetime
 
 #Our main model for Contacts 
 #Rest of our models have one to one reltionship with this model
+class ContactBook(models.Model):
+	user = models.ForeignKey(User, related_name='contactbook')
+	name = models.CharField(max_length=50)
+
+	class Meta:
+		unique_together = ('user', 'name')
+
+	def __unicode__(self):
+		return self.name 
+
+	def get_list_url(self):
+		return reverse('contactapp:contacts:list', kwargs={'cbpk':self.id})
+
+	def get_absolute_url(self):
+		return reverse('home')
+
+
 class Contact(models.Model):
-	user = models.ForeignKey(User, related_name='contacts')
+	contact_book = models.ForeignKey(ContactBook, related_name='contacts')
 	first_name  = models.CharField(max_length=64)
 	last_name = models.CharField(blank=True,null=True, max_length=64)
 	email_id = models.CharField(max_length=64)
@@ -17,7 +34,7 @@ class Contact(models.Model):
 	last_visited = models.DateTimeField(blank=True, default=datetime.now)
 
 	class Meta:
-		unique_together = ('user', 'email_id')
+		unique_together = ('contact_book', 'email_id')
 
 	def __unicode__(self):
 		return self.first_name
@@ -27,23 +44,23 @@ class Contact(models.Model):
 		super(Contact, self).save(*args, **kwargs)
 
 	def get_homecreate_url(self):
-		return reverse('contactapp:contacts:homecontactcreate', kwargs={'cpk':self.id})
+		return reverse('contactapp:contacts:homecontactcreate', kwargs={'cpk':self.id,'cbpk':self.contact_book_id})
 	def get_socialcreate_url(self):
-		return reverse('contactapp:contacts:socialcontactcreate', kwargs={'cpk':self.id})
+		return reverse('contactapp:contacts:socialcontactcreate', kwargs={'cpk':self.id,'cbpk':self.contact_book_id})
 
 	def get_officecreate_url(self):
-		return reverse('contactapp:contacts:officecontactcreate', kwargs={'cpk':self.id})
+		return reverse('contactapp:contacts:officecontactcreate', kwargs={'cpk':self.id,'cbpk':self.contact_book_id})
 	def get_othercreate_url(self):
-		return reverse('contactapp:contacts:othercontactcreate', kwargs={'cpk':self.id})
+		return reverse('contactapp:contacts:othercontactcreate', kwargs={'cpk':self.id,'cbpk':self.contact_book_id})
 
 	def get_absolute_url(self):
-		return reverse('contactapp:contacts:detail', kwargs={'pk':self.id})
+		return reverse('contactapp:contacts:detail', kwargs={'pk':self.id,'cbpk':self.contact_book_id})
 
 	def get_remove_url(self):
-		return reverse('contactapp:contacts:remove', kwargs={'pk':self.id})
+		return reverse('contactapp:contacts:remove', kwargs={'pk':self.id,'cbpk':self.contact_book_id})
 
 	def get_update_url(self):
-		return reverse('contactapp:contacts:update', kwargs={'pk':self.id})
+		return reverse('contactapp:contacts:update', kwargs={'pk':self.id,'cbpk':self.contact_book_id})
 
 
 class OfficeContact(models.Model):
@@ -56,11 +73,10 @@ class OfficeContact(models.Model):
 
 	def __unicode__(self):
 		return self.company
-
-	def get_absolute_url(self):
-		return reverse('contactapp:contacts:detail', kwargs={'pk':self.contact_id})
 	def get_update_url(self):
-		return reverse('contactapp:contacts:officecontactupdate', kwargs={'pk':self.id,'cpk':self.contact_id})
+		return reverse('contactapp:contacts:officecontactupdate',kwargs={'cbpk':self.contact.contact_book_id,'cpk':self.contact_id,'pk':self.id})
+
+	
 
 class SocialContact(models.Model):
 	SocialSite_Choice=(
@@ -72,10 +88,9 @@ class SocialContact(models.Model):
 	contact = models.ForeignKey(Contact, related_name='social')
 	social_site = models.CharField(max_length=2, choices= SocialSite_Choice)
 	detail = models.CharField(max_length=1024)
-	def get_absolute_url(self):
-		return reverse('contactapp:contacts:detail', kwargs={'pk':self.contact_id})
+
 	def get_update_url(self):
-		return reverse('contactapp:contacts:socialcontactupdate', kwargs={'pk':self.id,'cpk':self.contact_id})
+		return reverse('contactapp:contacts:socialcontactupdate',kwargs={'cbpk':self.contact.contact_book_id,'cpk':self.contact_id,'pk':self.id})
 
 class OtherContact(models.Model):
 	contact = models.ForeignKey(Contact, related_name='other')
@@ -84,11 +99,8 @@ class OtherContact(models.Model):
 
 	def __unicode__(self):
 		return self.name
-
-	def get_absolute_url(self):
-		return reverse('contactapp:contacts:detail', kwargs={'pk':self.contact_id})
 	def get_update_url(self):
-		return reverse('contactapp:contacts:othercontactupdate', kwargs={'pk':self.id,'cpk':self.contact_id})
+		return reverse('contactapp:contacts:othercontactupdate',kwargs={'cbpk':self.contact.contact_book_id,'cpk':self.contact_id,'pk':self.id})
 
 
 class HomeContact(models.Model):
@@ -99,7 +111,6 @@ class HomeContact(models.Model):
 
 	def __unicode__(self):
 		return self.telephone_number
-	def get_absolute_url(self):
-		return reverse('contactapp:contacts:detail', kwargs={'pk':self.contact_id})
+	
 	def get_update_url(self):
-		return reverse('contactapp:contacts:homecontactupdate', kwargs={'pk':self.id,'cpk':self.contact_id})
+		return reverse('contactapp:contacts:homecontactupdate',kwargs={'cbpk':self.contact.contact_book_id,'cpk':self.contact_id,'pk':self.id})

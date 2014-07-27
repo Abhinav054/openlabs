@@ -7,11 +7,15 @@
 {% endblock headline %}
 
 {% block content %}
-	{% for o in searchobject%}
-		<a href="{{ o.get_absolute_url }}">{{ o.first_name }}{{o.last_name}}</a>
-	{% empty %}
+	<ul class="list-group">
+            {% for object in searchobject %}
+            <li class="list-group-item">
+                <a href="{{ object.get_absolute_url }}">{{ object.first_name}} {{ object.last_name}}</a>
+            </li>
+            {% empty %}
             <li class="list-group-item">You have no contact that match the query</li>
-	{%endfor%}
+            {% endfor %}
+    </ul>
 	
 {% endblock content %}
 
